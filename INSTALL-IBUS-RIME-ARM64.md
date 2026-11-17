@@ -10,12 +10,14 @@
 
 系统必须已有可用的 IBus 1.5 及其桌面依赖；先确认 `ibus version` 能正常执行。旧源缺少 Rime 引擎可由这个包解决，缺少 IBus 框架本身仍需另行补齐。
 
+**从未安装 IBus、当前使用 Fcitx 的用户，先按 [首次安装与切换指南](INSTALL-IBUS-FROM-FCITX.md) 安装 `ibus` 和 `ibus-gtk3`。**完成框架安装后再继续本文，不要直接从停止 Fcitx 开始。
+
 ## 1. 下载、校验并固定位置
 
-下载 AppImage、`SHA256SUMS`、`BUILD-INFO.txt` 和 `VERIFICATION.txt`，放在同一目录，执行：
+至少下载 AppImage 和 `SHA256SUMS`，放在同一目录。`BUILD-INFO.txt`、`VERIFICATION.txt` 和中文指南可一并下载留档。校验时忽略尚未下载的可选文件：
 
 ```bash
-sha256sum -c SHA256SUMS
+sha256sum --ignore-missing -c SHA256SUMS
 mkdir -p "$HOME/Applications"
 cp ibus-rime-bullseye-aarch64.AppImage "$HOME/Applications/"
 chmod +x "$HOME/Applications/ibus-rime-bullseye-aarch64.AppImage"
