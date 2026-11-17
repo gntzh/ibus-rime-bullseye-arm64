@@ -70,7 +70,7 @@ patch_lib "/usr/lib/$(gcc -print-multiarch)" libstdc++.so.6
 patch_lib "/lib/$(gcc -print-multiarch)" libgcc_s.so.1
 g++ -std=c++17 /project/packaging/ibus-rime/rime-smoke.cc \
     -I librime/src -L AppDir/usr/lib -Wl,-rpath-link,"$PWD/AppDir/usr/lib" \
-    -Wl,-rpath,'$ORIGIN/../lib' -lrime -o AppDir/usr/bin/rime-smoke
+    -Wl,-rpath,'$ORIGIN/../lib' -l:librime.so.1 -o AppDir/usr/bin/rime-smoke
 
 mkdir -p AppDir/usr/share/rime-data
 cp -a plum/output-minimal/. AppDir/usr/share/rime-data/

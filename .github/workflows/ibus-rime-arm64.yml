@@ -29,6 +29,12 @@ jobs:
             -v "$PWD:/project" -v "$PWD/upstream:/work" \
             ibus-rime-builder bash /project/packaging/ibus-rime/build-bullseye.sh
           sudo chown -R "$(id -u):$(id -g)" upstream dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appdir-bullseye-arm64
+          path: |
+            upstream/AppDir/
+            dist/BUILD-INFO.txt
       - name: Download and verify native packaging tools
         run: |
           curl -fL --retry 3 -o appimagetool.AppImage \
