@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
+printf 'deb http://archive.debian.org/debian bullseye main\ndeb http://archive.debian.org/debian-security bullseye-security main\n' > /etc/apt/sources.list
+printf 'Acquire::Check-Valid-Until "false";\n' > /etc/apt/apt.conf.d/99archive
 apt-get update -qq
 apt-get install -y --no-install-recommends \
     ibus libnotify4 file binutils python3 dbus-x11 xvfb

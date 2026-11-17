@@ -64,6 +64,10 @@ fetch_ibus_rime
 fetch_plum
 build
 
+# Keep the C++ runtime private instead of requiring Kylin's GCC runtime to match.
+patch_lib "/usr/lib/$(gcc -print-multiarch)" libstdc++.so.6
+patch_lib "/lib/$(gcc -print-multiarch)" libgcc_s.so.1
+
 mkdir -p AppDir/usr/share/rime-data
 cp -a plum/output-minimal/. AppDir/usr/share/rime-data/
 cp -a librime/share/opencc/. AppDir/usr/share/rime-data/
