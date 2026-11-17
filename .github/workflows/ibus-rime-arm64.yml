@@ -19,9 +19,11 @@ jobs:
           ref: 012daad0f2ab8585b59c57815763ccdc050fe3d9
           path: upstream
           persist-credentials: false
-      - name: Build in native Debian bullseye arm64 container
+      - name: Prepare Debian bullseye arm64 build environment
         run: |
           docker build -t ibus-rime-builder packaging/ibus-rime
+      - name: Compile native Rime and plugins
+        run: |
           docker run --rm \
             -e BUILD_RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             -v "$PWD:/project" -v "$PWD/upstream:/work" \

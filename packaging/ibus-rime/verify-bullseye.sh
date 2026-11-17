@@ -37,4 +37,30 @@ APPIMAGE_EXTRACT_AND_RUN=1 ./ibus-rime.AppImage version
 APPIMAGE_EXTRACT_AND_RUN=1 ./ibus-rime.AppImage ibus-engine-rime --help
 mkdir -p /tmp/rime-user
 APPIMAGE_EXTRACT_AND_RUN=1 ./ibus-rime.AppImage rime_deployer --build /tmp/rime-user "$APPDIR/usr/share/rime-data"
+mkdir -p /tmp/rime-lua-user/lua
+cat > /tmp/rime-lua-user/default.yaml <<'EOF'
+config_version: '1'
+schema_list:
+  - schema: smoke
+EOF
+cat > /tmp/rime-lua-user/smoke.schema.yaml <<'EOF'
+schema:
+  schema_id: smoke
+  name: smoke
+  version: '1'
+engine:
+  processors: [speller, selector, express_editor]
+  segmentors: [abc_segmentor]
+  translators: [lua_translator@*smoke]
+speller:
+  alphabet: abcdefghijklmnopqrstuvwxyz
+EOF
+cat > /tmp/rime-lua-user/lua/smoke.lua <<'EOF'
+return function(input, seg)
+  if input == "test" then
+    yield(Candidate("smoke", seg.start, seg._end, "中文测试", "Lua"))
+  end
+end
+EOF
+APPIMAGE_EXTRACT_AND_RUN=1 ./ibus-rime.AppImage rime-smoke "$APPDIR/usr/share/rime-data" /tmp/rime-lua-user
 printf '\nPASS: bullseye arm64 CLI/deployment and ELF checks\n'
