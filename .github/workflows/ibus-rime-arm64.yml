@@ -1,0 +1,54 @@
+name: ibus-rime bullseye arm64
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/ibus-rime-arm64.yml'
+      - 'packaging/ibus-rime/**'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: hchunhui/ibus-rime.AppImage
+          ref: 012daad0f2ab8585b59c57815763ccdc050fe3d9
+          path: upstream
+          persist-credentials: false
+      - name: Build in native Debian bullseye arm64 container
+        run: |
+          docker build -t ibus-rime-builder packaging/ibus-rime
+          docker run --rm \
+            -e BUILD_RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            -v "$PWD:/project" -v "$PWD/upstream:/work" \
+            ibus-rime-builder bash /project/packaging/ibus-rime/build-bullseye.sh
+          sudo chown -R "$(id -u):$(id -g)" upstream dist
+      - name: Download and verify native packaging tools
+        run: |
+          curl -fL --retry 3 -o appimagetool.AppImage \
+            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-aarch64.AppImage
+          echo 'd6a061996de690434996c2a523eafedd0a23780aaf02d69ce364537e71607e94  appimagetool.AppImage' | sha256sum -c
+          curl -fL --retry 3 -o runtime-aarch64 \
+            https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-aarch64
+          echo '9a72a744d221576c9347ec074243acc5c3c7568896b12714e0e82e9f0bf47900  runtime-aarch64' | sha256sum -c
+          chmod +x appimagetool.AppImage
+      - name: Package aarch64 AppImage
+        run: |
+          ARCH=aarch64 APPIMAGE_EXTRACT_AND_RUN=1 ./appimagetool.AppImage \
+            --runtime-file runtime-aarch64 upstream/AppDir dist/ibus-rime-bullseye-aarch64.AppImage
+      - name: Verify inside clean bullseye container
+        run: |
+          docker run --rm -v "$PWD:/project:ro" \
+            debian:bullseye bash /project/packaging/ibus-rime/verify-bullseye.sh \
+            | tee dist/VERIFICATION.txt
+          cd dist
+          sha256sum ibus-rime-bullseye-aarch64.AppImage BUILD-INFO.txt VERIFICATION.txt > SHA256SUMS
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ibus-rime-bullseye-arm64
+          path: dist/
+          if-no-files-found: error
